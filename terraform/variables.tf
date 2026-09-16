@@ -17,3 +17,15 @@ variable "prefix" {
     error_message = "prefix must be 2 to 10 characters: lowercase letters, digits and hyphens."
   }
 }
+
+variable "vnet_address_space" {
+  description = "Address space of the virtual network"
+  type        = list(string)
+}
+
+variable "subnets" {
+  description = "Subnets to create, keyed by tier name"
+  type = map(object({
+    address_prefix = string
+  }))
+}
