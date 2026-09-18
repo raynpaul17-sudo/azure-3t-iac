@@ -26,3 +26,18 @@ resource "azurerm_subnet_network_security_group_association" "main" {
   subnet_id                 = azurerm_subnet.main[each.key].id
   network_security_group_id = azurerm_network_security_group.main[each.key].id
 }
+
+resource "azurerm_network_security_rule" "main" {
+  for_each                    = var.security_rules
+  name                        = each.key
+  priority                    = each.value.priority
+  direction                   = "Inbound"
+  access                      = each.value.access
+  protocol                    = each.value.protocol
+  source_port_range           = "*"
+  destination_port_range      = each.value.destination_port_range
+  source_address_prefix       = each.value.source_address_prefix
+  destination_address_prefix  = "*"
+  network_security_group_name = azurerm_network_security_group.main[each.value.tier].name
+  resource_group_name         = var.resource_group_name
+}

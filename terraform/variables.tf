@@ -29,3 +29,27 @@ variable "subnets" {
     address_prefix = string
   }))
 }
+
+variable "admin_ip" {
+  description = "Public IP allowed to SSH into the front VM, in CIDR notation (e.g. 203.0.113.10/32)"
+  type        = string
+  validation {
+    condition     = can(cidrhost(var.admin_ip, 0))
+    error_message = "admin_ip must be a valid CIDR, for example 203.0.113.10/32."
+  }
+  sensitive = true
+}
+
+variable "ssh_frontend_port" {
+  description = "Public port forwarded to SSH on the front VM"
+  type        = number
+}
+
+variable "lb_rules" {
+  description = "Load Balancing rules, keyed by rule name"
+  type = map(object({
+    frontend_port = number
+    backend_port  = number
+    protocol      = string
+  }))
+}

@@ -12,3 +12,8 @@ output "vnet_name" {
   description = "Name of the created vnet"
   value       = module.network.vnet_name
 }
+
+output "lb_public_ip" {
+  description = "Public IP of the load balancer"
+  value       = module.loadbalancer.public_ip_address
+}

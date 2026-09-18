@@ -25,3 +25,14 @@ variable "subnets" {
   }))
 }
 
+variable "security_rules" {
+  description = "NSG rules to create, keyed by rule name"
+  type = map(object({
+    tier                   = string
+    priority               = number
+    access                 = string
+    protocol               = string
+    source_address_prefix  = string
+    destination_port_range = string
+  }))
+}
