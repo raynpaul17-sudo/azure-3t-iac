@@ -17,3 +17,9 @@ output "lb_public_ip" {
   description = "Public IP of the load balancer"
   value       = module.loadbalancer.public_ip_address
 }
+
+output "vm_private_ips" {
+  description = "Private IP addresses of the VMs, keyed by tier name"
+  value       = module.compute.private_ips
+
+}

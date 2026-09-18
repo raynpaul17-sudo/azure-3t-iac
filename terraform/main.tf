@@ -22,6 +22,20 @@ module "loadbalancer" {
   lb_rules            = var.lb_rules
 }
 
+module "compute" {
+  source                   = "./modules/compute"
+  location                 = var.location
+  resource_group_name      = azurerm_resource_group.main.name
+  prefix                   = var.prefix
+  subnet_ids               = module.network.subnet_ids
+  vms                      = var.vms
+  admin_username           = var.admin_username
+  ssh_public_key_path      = file(pathexpand(var.ssh_public_key_path))
+  backend_pool_outbound_id = module.loadbalancer.backend_pool_outbound_id
+  nat_rule_ssh_id          = module.loadbalancer.nat_rule_ssh_id
+  backend_pool_web_id      = module.loadbalancer.backend_pool_web_id
+}
+
 
 # ----NSG Security Rules------
 locals {

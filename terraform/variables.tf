@@ -53,3 +53,20 @@ variable "lb_rules" {
     protocol      = string
   }))
 }
+
+variable "vms" {
+  description = "Virtual machines to create, keyed by tier name"
+  type = map(object({
+    size = string
+  }))
+}
+
+variable "admin_username" {
+  description = "Administrator username created on every VM"
+  type        = string
+}
+
+variable "ssh_public_key_path" {
+  description = "Public SSH key content authorized for the admin user"
+  type        = string
+}
