@@ -113,6 +113,14 @@ Le port public du SSH n'est pas 22. Ce n'est pas une mesure de sécurité — le
 
 Lorsqu'une règle sortante et des règles d'entrée partagent la même adresse publique, Azure impose que les règles d'entrée n'assurent pas elles-mêmes la traduction sortante.
 
+### Accès aux VM
+
+Aucune VM ne dispose d'adresse publique. L'accès administratif passe par la règle NAT du Load Balancer vers le front, puis par rebond SSH vers les autres tiers. L'authentification par mot de passe est désactivée : seule une clé publique fournie en variable autorise la connexion.
+
+Chaque VM porte une identité managée de type système, utilisée en phase 3 pour lire les secrets du Key Vault sans qu'aucun identifiant ne soit stocké sur la machine.
+
+Le Load Balancer ne traduit que le trafic TCP et UDP en sortie : les tests de connectivité sortante se font en TCP, un `ping` vers internet échouant même lorsque l'accès sortant fonctionne.
+
 ## Limites connues
 
 - **Pas de WAF** : en production, un Application Gateway avec WAF ou Azure Front Door filtrerait les attaques applicatives et terminerait le TLS. Écarté pour des raisons de coût et de périmètre.
