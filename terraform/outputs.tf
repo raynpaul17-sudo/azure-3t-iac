@@ -23,3 +23,14 @@ output "vm_private_ips" {
   value       = module.compute.private_ips
 
 }
+
+output "ssh_frontend_port" {
+  description = "Public port forwarded to SSH on the front VM"
+  value       = var.ssh_frontend_port
+}
+
+output "adminusername" {
+  description = "Administrator username created on every VM"
+  value       = var.admin_username
+}
+  
