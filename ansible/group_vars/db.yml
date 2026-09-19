@@ -1,0 +1,7 @@
+ufw_custom_rules:
+  - port: "5432"
+    proto: tcp
+    src: "{{ subnet_back }}"
+  - port: "22"
+    proto: tcp
+    src: "{{ subnet_front }}"

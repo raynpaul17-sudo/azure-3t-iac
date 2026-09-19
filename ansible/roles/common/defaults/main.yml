@@ -1,0 +1,5 @@
+common_apt_upgrade: true
+common_apt_cache_valid_time: 3600
+common_ntp_services: systemd-timesyncd
+ufw_custom_rules: []
+common_ssh_port: 22

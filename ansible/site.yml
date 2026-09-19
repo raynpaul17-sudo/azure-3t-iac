@@ -1,0 +1,5 @@
+- name: Apply common hardening and base configuration
+  hosts: all
+  become: true
+  roles:
+    - common

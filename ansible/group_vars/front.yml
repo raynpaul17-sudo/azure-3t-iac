@@ -1,0 +1,10 @@
+ufw_custom_rules:
+  - port: "80"
+    proto: tcp
+    src: any
+  - port: "443"
+    proto: tcp
+    src: any
+  - port: "22"
+    proto: tcp
+    src: "{{ admin_ip }}"

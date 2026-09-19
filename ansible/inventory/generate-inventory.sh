@@ -19,6 +19,10 @@ BACK_IP="$(echo "${TF_JSON}" | jq -r '.vm_private_ips.value["back"]')"
 DB_IP="$(echo "${TF_JSON}" | jq -r '.vm_private_ips.value["db"]')"
 ADMIN_USERNAME="$(echo "${TF_JSON}" | jq -r '.adminusername["value"]')"
 SSH_FRONTEND_PORT="$(echo "${TF_JSON}" | jq -r '.ssh_frontend_port["value"]')"
+FRONT_CIDR="$(echo "${TF_JSON}" | jq -r '.subnet_address_prefixes.value["front"]')"
+BACK_CIDR="$(echo "${TF_JSON}" | jq -r '.subnet_address_prefixes.value["back"]')"
+DB_CIDR="$(echo "${TF_JSON}" | jq -r '.subnet_address_prefixes.value["db"]')"
+ADMIN_IP="$(echo "${TF_JSON}" | jq -r '.admin_ip.value')"
 
 # Check required values
 if [[ -z "${LB_IP}" || "${LB_IP}" == "null" ]]; then
@@ -41,6 +45,10 @@ cat <<EOF > "${OUTPUT_FILE}"
 all:
   vars:
     ansible_user: "${ADMIN_USERNAME}"
+    subnet_front: "${FRONT_CIDR}"
+    subnet_back: "${BACK_CIDR}"
+    subnet_db: "${DB_CIDR}"
+    admin_ip: "${ADMIN_IP}"
   children:
     front:
       hosts:

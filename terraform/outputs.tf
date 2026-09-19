@@ -34,3 +34,13 @@ output "adminusername" {
   value       = var.admin_username
 }
   
+output "subnet_address_prefixes" {
+  description = "Address prefix of each subnet, keyed by tier name"
+  value       = { for name, subnet in var.subnets : name => subnet.address_prefix }
+}
+
+output "admin_ip" {
+  description = "Public IP allowed to SSH into the front VM"
+  value       = var.admin_ip
+  sensitive   = true
+}
