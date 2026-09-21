@@ -1,0 +1,8 @@
+db_name: "app_db"
+db_user: "app_user"
+
+db_postgresql_version: "16"
+db_config_dir: "/etc/postgresql/{{ db_postgresql_version }}/main"
+# Note: The database user password (db_password) must NOT be stored here.
+# It is passed at runtime via extra-vars (-e "db_password=...")
+# and will come from Azure Key Vault in phase 3.

@@ -1,0 +1,52 @@
+- name: Install Postgresql and psycopg2 dependencies
+  ansible.builtin.apt:
+    name:
+      - "postgresql-{{ db_postgresql_version }}"
+      - python3-psycopg2 # Required for community.postgresql Ansible modules
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure Postgresql service is active and starts at boot
+  ansible.builtin.service:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: Configure PostgreSQL listen_addresses
+  community.postgresql.postgresql_alter_system:
+    param: listen_addresses
+    value: "localhost, {{ ansible_facts['default_ipv4']['address'] }}"
+  become_user: postgres
+  notify: Restart postgresql
+
+- name: Allow backend subnet connection in pg_hba.conf
+  community.postgresql.postgresql_pg_hba:
+    dest: "{{ db_config_dir }}/pg_hba.conf"
+    contype: host
+    databases: "{{ db_name }}"
+    users: "{{ db_user }}"
+    source: "{{ subnet_back }}" # Backend subnet
+    method: scram-sha-256
+    create: true
+  become_user: postgres
+  notify: Reload postgresql
+
+- name: Flush handlers before database operations
+  ansible.builtin.meta: flush_handlers
+
+- name: Create PostgreSQL application user
+  community.postgresql.postgresql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    encrypted: true
+    state: present
+  become_user: postgres
+  no_log: true
+
+- name: Create PostgreSQL application database
+  community.postgresql.postgresql_db:
+    name: "{{ db_name }}"
+    owner: "{{ db_user }}"
+    state: present
+  become_user: postgres

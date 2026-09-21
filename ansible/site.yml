@@ -3,3 +3,9 @@
   become: true
   roles:
     - common
+
+- name: Configure database server
+  hosts: db
+  become: true
+  roles:
+    - db
