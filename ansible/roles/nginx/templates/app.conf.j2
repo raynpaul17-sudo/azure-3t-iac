@@ -1,6 +1,6 @@
 # HTTP server block (Port 80)
 server {
-    listen {{ {{ ansible_facts['default_ipv4']['address'] }} }}:80;
+    listen {{ ansible_facts['default_ipv4']['address'] }}:80;
     server_name _;
 
     # Direct health check response for Azure Load Balancer
