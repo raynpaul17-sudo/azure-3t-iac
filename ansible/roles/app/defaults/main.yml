@@ -1,4 +1,3 @@
-app_port: 8080
 app_user: "appuser"
 app_group: "appuser"
 app_install_dir: "/opt/app"

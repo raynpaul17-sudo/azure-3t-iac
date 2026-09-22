@@ -1,0 +1,109 @@
+# Install Nginx package
+- name: Install Nginx
+  ansible.builtin.apt:
+    name:
+      - nginx
+      - python3-cryptography # Required for community.crypto modules
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+# Create secure directory for TLS assets
+- name: Create TLS directory
+  ansible.builtin.file:
+    path: "{{ nginx_tls_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+# Generate private key (readable only by root)
+- name: Generate OpenSSL private key
+  community.crypto.openssl_privatekey:
+    path: "{{ nginx_ssl_key }}"
+    type: RSA
+    size: 2048
+    owner: root
+    group: root
+    mode: "0600"
+  notify: "nginx config changed"
+
+# Generate CSR in memory and sign self-signed certificate
+- name: Generate OpenSSL CSR
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ nginx_ssl_key }}"
+    common_name: "{{ lb_public_ip }}"
+    subject_alt_name:
+      - "IP:{{ lb_public_ip }}"
+  register: nginx_csr
+  changed_when: false
+
+- name: Generate self-signed certificate
+  community.crypto.x509_certificate:
+    path: "{{ nginx_ssl_cert }}"
+    csr_content: "{{ nginx_csr.csr }}"
+    privatekey_path: "{{ nginx_ssl_key }}"
+    provider: selfsigned
+    selfsigned_not_after: "+{{ nginx_cert_validity_days }}d"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: "nginx config changed"
+
+# Deploy site configuration
+- name: Deploy Nginx reverse proxy configuration
+  ansible.builtin.template:
+    src: app.conf.j2
+    dest: "/etc/nginx/sites-available/{{ nginx_site_name }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: "nginx config changed"
+
+# Enable custom site via symlink
+- name: Enable custom site configuration
+  ansible.builtin.file:
+    src: "/etc/nginx/sites-available/{{ nginx_site_name }}"
+    dest: "/etc/nginx/sites-enabled/{{ nginx_site_name }}"
+    state: link
+  notify: "nginx config changed"
+
+# Remove default site
+- name: Remove default Nginx site configuration
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify:
+    - Validate nginx
+    - Restart nginx
+
+# Ensure Nginx is enabled and running
+- name: Ensure Nginx service is running and enabled
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+
+# Apply handlers immediately before health check verification
+- name: Flush handlers to validate and reload Nginx
+  ansible.builtin.meta: flush_handlers
+
+# Verify local endpoints
+- name: Verify HTTP healthz endpoint returns 200
+  ansible.builtin.uri:
+    url: "http://{{ ansible_facts['default_ipv4']['address'] }}/healthz"
+    status_code: 200
+  register: nginx_healthz
+  retries: 5
+  delay: 2
+  until: nginx_healthz is succeeded
+
+- name: Verify HTTPS proxy health endpoint returns 200
+  ansible.builtin.uri:
+    url: "https://{{ ansible_facts['default_ipv4']['address'] }}/health"
+    status_code: 200
+    validate_certs: false
+  register: nginx_proxy_health
+  retries: 5
+  delay: 2
+  until: nginx_proxy_health is succeeded

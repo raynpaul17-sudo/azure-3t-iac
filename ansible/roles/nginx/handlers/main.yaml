@@ -1,0 +1,17 @@
+# Handlers are executed in order of appearance
+- name: Validate nginx
+  ansible.builtin.command:
+    cmd: nginx -t
+  changed_when: false
+  listen: "nginx config changed"
+
+- name: Reload nginx
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
+  listen: "nginx config changed"
+
+- name: Restart nginx
+  ansible.builtin.service:
+    name: nginx
+    state: restarted

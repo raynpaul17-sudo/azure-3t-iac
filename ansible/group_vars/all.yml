@@ -1,3 +1,4 @@
 # Database shared configuration
 db_name: "app_db"
 db_user: "app_user"
+app_port: "8080"

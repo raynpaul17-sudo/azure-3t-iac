@@ -15,3 +15,9 @@
   become: true
   roles:
     - app
+
+- name: Configure reverse proxy
+  hosts: front
+  become: true
+  roles:
+    - nginx

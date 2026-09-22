@@ -1,3 +1,4 @@
 collections:
   - name: community.postgresql
   - name: community.general
+  - name: community.crypto

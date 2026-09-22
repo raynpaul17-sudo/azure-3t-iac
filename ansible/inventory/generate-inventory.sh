@@ -23,6 +23,7 @@ FRONT_CIDR="$(echo "${TF_JSON}" | jq -r '.subnet_address_prefixes.value["front"]
 BACK_CIDR="$(echo "${TF_JSON}" | jq -r '.subnet_address_prefixes.value["back"]')"
 DB_CIDR="$(echo "${TF_JSON}" | jq -r '.subnet_address_prefixes.value["db"]')"
 ADMIN_IP="$(echo "${TF_JSON}" | jq -r '.admin_ip.value')"
+LB_PUBLIC_IP="$(echo "${TF_JSON}" | jq -r '.lb_public_ip.value')"
 
 # Check required values
 if [[ -z "${LB_IP}" || "${LB_IP}" == "null" ]]; then
@@ -49,6 +50,7 @@ all:
     subnet_back: "${BACK_CIDR}"
     subnet_db: "${DB_CIDR}"
     admin_ip: "${ADMIN_IP}"
+    lb_public_ip: "${LB_PUBLIC_IP}"
   children:
     front:
       hosts:

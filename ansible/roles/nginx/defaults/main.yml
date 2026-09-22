@@ -1,0 +1,8 @@
+# TLS paths and certificate settings
+nginx_tls_dir: "/etc/nginx/tls"
+nginx_ssl_cert: "{{ nginx_tls_dir }}/app.crt"
+nginx_ssl_key: "{{ nginx_tls_dir }}/app.key"
+nginx_cert_validity_days: 365
+
+# Site configuration name
+nginx_site_name: "app.conf"
