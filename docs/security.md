@@ -6,8 +6,9 @@
 - **Exposition minimale** : un seul point d'entrée public, le Load Balancer. SSH restreint à une IP d'administration. Aucune IP publique sur les VM.
 - **Aucun secret dans le code** : les secrets sont stockés dans Key Vault et lus par les VM via leur identité managée. L'authentification de la pipeline repose sur OIDC, sans identifiant stocké.
 - **Moindre privilège** : les rôles sont limités au resource group du projet et au besoin réel de chaque identité.
-- **Durcissement des VM** : authentification SSH par clé uniquement, accès root interdit, pare-feu local, mises à jour appliquées.
+- **Durcissement des VM** : authentification SSH par clé uniquement, connexion root interdite, pare-feu local en refus par défaut, mises à jour appliquées au déploiement. Les services tournent sous des utilisateurs dédiés, et l'application est confinée par systemd (système de fichiers en lecture seule, aucune élévation de privilèges).
 - **Chiffrement en transit** : TLS terminé sur le front.
+- **Défense en profondeur** : chaque flux est filtré par plusieurs couches indépendantes, administrées séparément : NSG au niveau du réseau Azure, pare-feu local sur chaque VM, écoute des services restreinte à leur adresse privée, et authentification applicative. Une erreur sur une couche ne suffit pas à ouvrir un flux.
 
 ## Contrôles automatiques dans la pipeline
 
