@@ -1,0 +1,82 @@
+# Install required OS packages
+- name: Install Python, Flask, Gunicorn and database driver
+  ansible.builtin.apt:
+    name:
+      - python3-flask
+      - python3-psycopg2
+      - gunicorn
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+# Create dedicated unprivileged system user
+- name: Create app system group
+  ansible.builtin.group:
+    name: "{{ app_group }}"
+    system: true
+    state: present
+
+- name: Create app system user
+  ansible.builtin.user:
+    name: "{{ app_user }}"
+    group: "{{ app_group }}"
+    system: true
+    shell: /usr/sbin/nologin
+    create_home: false
+    home: "{{ app_install_dir }}"
+    state: present
+
+# Create application directory
+- name: Create application directory
+  ansible.builtin.file:
+    path: "{{ app_install_dir }}"
+    state: directory
+    owner: "root"
+    group: "{{ app_group }}"
+    mode: "0750"
+
+# Deploy application code
+- name: Copy application source code
+  ansible.builtin.copy:
+    src: app.py
+    dest: "{{ app_install_dir }}/app.py"
+    owner: "root"
+    group: "{{ app_group }}"
+    mode: "0640"
+  notify: Restart app
+
+- name: Create application configuration directory
+  ansible.builtin.file:
+    path: /etc/app
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+# Deploy environment file with secret credentials
+- name: Deploy application environment file
+  ansible.builtin.template:
+    src: app.env.j2
+    dest: "/etc/app/app.env"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+  no_log: true
+  notify: Restart app
+
+# Deploy hardened systemd unit file
+- name: Deploy systemd unit file
+  ansible.builtin.template:
+    src: app.service.j2
+    dest: /etc/systemd/system/app.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart app
+
+# Enable and start app service
+- name: Ensure app service is enabled and started
+  ansible.builtin.systemd_service:
+    name: app
+    state: started
+    enabled: true

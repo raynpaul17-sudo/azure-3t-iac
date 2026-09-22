@@ -1,0 +1,22 @@
+[Unit]
+Description=Gunicorn instance to serve minimal backend application
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User={{ app_user }}
+Group={{ app_group }}
+WorkingDirectory={{ app_install_dir }}
+EnvironmentFile=/etc/app/app.env
+ExecStart=/usr/bin/gunicorn --workers 2 --bind {{ ansible_facts['default_ipv4']['address'] }}:{{ app_port }} app:app
+Restart=always
+RestartSec=5
+
+# Security Hardening (systemd.exec)
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

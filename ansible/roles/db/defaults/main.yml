@@ -1,6 +1,3 @@
-db_name: "app_db"
-db_user: "app_user"
-
 db_postgresql_version: "16"
 db_config_dir: "/etc/postgresql/{{ db_postgresql_version }}/main"
 # Note: The database user password (db_password) must NOT be stored here.

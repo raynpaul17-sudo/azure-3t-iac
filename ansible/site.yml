@@ -9,3 +9,9 @@
   become: true
   roles:
     - db
+
+- name: Configure application server
+  hosts: back
+  become: true
+  roles:
+    - app
