@@ -39,7 +39,7 @@ resource "azurerm_lb_probe" "main" {
   name            = "lb-probe-${var.prefix}"
   port            = 80
   protocol        = "Http"
-  request_path    = "/"
+  request_path    = "/healthz"
 }
 
 resource "azurerm_lb_rule" "main" {
