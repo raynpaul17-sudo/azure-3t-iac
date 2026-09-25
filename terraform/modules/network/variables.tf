@@ -21,7 +21,8 @@ variable "vnet_address_space" {
 variable "subnets" {
   description = "Subnets to create, keyed by tier name"
   type = map(object({
-    address_prefix = string
+    address_prefix    = string
+    service_endpoints = optional(list(string), [])
   }))
 }
 

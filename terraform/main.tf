@@ -36,6 +36,22 @@ module "compute" {
   backend_pool_web_id      = module.loadbalancer.backend_pool_web_id
 }
 
+module "keyvault" {
+  source              = "./modules/keyvault"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.main.name
+  prefix              = var.prefix
+  admin_ip            = var.admin_ip
+  reader_principal_ids = {
+    back = module.compute.identity_principal_ids["back"]
+    db   = module.compute.identity_principal_ids["db"]
+  }
+  subnet_ids = [
+    module.network.subnet_ids["back"],
+    module.network.subnet_ids["db"],
+  ]
+  secret_name = var.secret_name
+}
 
 # ----NSG Security Rules------
 locals {

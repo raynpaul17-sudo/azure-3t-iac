@@ -26,7 +26,8 @@ variable "vnet_address_space" {
 variable "subnets" {
   description = "Subnets to create, keyed by tier name"
   type = map(object({
-    address_prefix = string
+    address_prefix    = string
+    service_endpoints = optional(list(string), [])
   }))
 }
 
@@ -68,5 +69,10 @@ variable "admin_username" {
 
 variable "ssh_public_key_path" {
   description = "Public SSH key content authorized for the admin user"
+  type        = string
+}
+
+variable "secret_name" {
+  description = "Name of the created db secret"
   type        = string
 }

@@ -12,6 +12,13 @@ resource "azurerm_subnet" "main" {
   address_prefixes                = [each.value.address_prefix]
   virtual_network_name            = azurerm_virtual_network.main.name
   default_outbound_access_enabled = false
+
+  dynamic "service_endpoint" {
+    for_each = each.value.service_endpoints
+    content {
+      service = service_endpoint.value
+    }
+  }
 }
 
 resource "azurerm_network_security_group" "main" {
