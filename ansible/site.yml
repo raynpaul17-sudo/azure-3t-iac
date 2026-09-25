@@ -8,12 +8,14 @@
   hosts: db
   become: true
   roles:
+    - keyvault_secret
     - db
 
 - name: Configure application server
   hosts: back
   become: true
   roles:
+    - keyvault_secret
     - app
 
 - name: Configure reverse proxy
