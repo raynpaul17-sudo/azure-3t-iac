@@ -35,3 +35,33 @@ Des tests exécutés sur l'infrastructure déployée prouvent que la segmentatio
 ## Gestion des valeurs sensibles
 
 La variable `admin_ip` est déclarée `sensitive` : elle est masquée dans les sorties de `plan` et dans les journaux de pipeline. Elle reste en revanche lisible dans le state Terraform, qui doit donc être protégé et n'est jamais versionné.
+
+## Gestion des secrets
+
+Le mot de passe de la base de données n'est jamais saisi, ni stocké hors du coffre.
+
+Terraform le génère par une **ressource éphémère**, qui n'existe qu'en mémoire pendant l'exécution, et l'écrit dans Key Vault via un **argument en écriture seule**. Il n'apparaît donc ni dans le fichier de plan, ni dans le state Terraform. Les ressources éphémères étant réévaluées à chaque exécution, un numéro de version explicite détermine quand le secret doit être réécrit : tant qu'il n'est pas incrémenté, la valeur du coffre reste inchangée.
+
+### Accès sans identifiant
+
+Chaque machine porte une identité managée attribuée par Azure. Pour lire le secret, elle demande un jeton au service de métadonnées de l'instance, joignable uniquement depuis la machine elle-même, puis le présente au coffre. Aucun identifiant, aucune clé et aucun mot de passe ne sont stockés sur les machines.
+
+### Moindre privilège
+
+| Identité                          | Rôle                      | Portée    |
+| --------------------------------- | ------------------------- | --------- |
+| Compte exécutant Terraform        | Key Vault Secrets Officer | le coffre |
+| Identité de la VM applicative     | Key Vault Secrets User    | le secret |
+| Identité de la VM base de données | Key Vault Secrets User    | le secret |
+
+La VM front ne reçoit aucun droit : elle n'a pas besoin du mot de passe. L'attribution porte sur l'identifiant **sans version** du secret ; l'identifiant versionné, accepté par Terraform, ne couvrirait qu'une version précise et serait invalidé par toute rotation.
+
+### Accès réseau au coffre
+
+Le coffre refuse tout accès par défaut. Seuls l'adresse d'administration et les subnets applicatif et base de données sont autorisés. Ces deux subnets disposent d'un point de terminaison de service vers Key Vault : sans lui, leurs requêtes sortiraient par l'adresse publique du load balancer et la règle par subnet serait inopérante.
+
+### Limites connues
+
+- **Accès public du coffre maintenu** : le coffre conserve une adresse publique, protégée par son pare-feu. Un point de terminaison privé le retirerait totalement d'internet, au prix d'une facturation horaire et d'une zone DNS privée.
+- **Protection contre la purge désactivée** : l'infrastructure étant éphémère, le coffre doit pouvoir être purgé à la destruction pour que son nom soit réutilisable. En production, cette protection serait activée.
+- **Propagation des attributions de rôle** : une attribution met quelques minutes à devenir effective, ce qui impose une dépendance explicite entre l'attribution et la première écriture du secret.
