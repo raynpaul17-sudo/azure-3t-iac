@@ -14,15 +14,28 @@
 
 Chaque contrôle s'exécute à chaque `push`, et un échec interrompt la pipeline.
 
-| Contrôle             | Rôle                                                                  | État     |
-| -------------------- | --------------------------------------------------------------------- | -------- |
-| Secret Detection     | détecte un secret commité par erreur                                  | en place |
-| `terraform fmt`      | format cohérent du code                                               | prévu    |
-| `terraform validate` | configuration syntaxiquement et structurellement valide               | prévu    |
-| `tflint`             | erreurs et mauvaises pratiques Terraform propres à Azure              | prévu    |
-| `checkov`            | mauvaises configurations de sécurité (exposition, chiffrement, accès) | prévu    |
-| `ansible-lint`       | mauvaises pratiques Ansible, dont les secrets exposés dans les logs   | prévu    |
-| `terraform plan`     | relu avant tout `apply` : aucun déploiement à l'aveugle               | prévu    |
+| Contrôle             | Rôle                                                                      |
+| -------------------- | ------------------------------------------------------------------------- |
+| Secret Detection     | détecte un secret commité par erreur                                      |
+| `terraform fmt`      | format cohérent du code                                                   |
+| `terraform validate` | configuration syntaxiquement et structurellement valide                   |
+| `tflint`             | erreurs et mauvaises pratiques Terraform, exigences de version par module |
+| `checkov`            | mauvaises configurations de sécurité (exposition, chiffrement, accès)     |
+| `ansible-lint`       | mauvaises pratiques Ansible, dont les secrets exposés dans les journaux   |
+
+### Exceptions assumées
+
+Quatre contrôles `checkov` sont explicitement ignorés, avec leur justification inscrite dans le code à côté de la ressource concernée :
+
+- **protection contre la purge du coffre** et **récupérabilité du coffre** : l'infrastructure est éphémère, le coffre doit pouvoir être purgé à la destruction pour que son nom reste réutilisable
+- **point de terminaison privé pour le coffre** : facturé à l'heure et nécessitant une zone DNS privée ; l'accès est restreint par le pare-feu du coffre et les points de terminaison de service
+- **extensions de machine virtuelle** : aucune extension n'est déclarée, la règle se déclenche sur le bloc d'identité managée
+
+Aucun contrôle n'est désactivé globalement, et aucune exception n'est posée sans raison écrite.
+
+### Versions figées
+
+Les images des outils d'analyse et les collections Ansible sont épinglées : une montée de version d'un outil ne peut pas modifier le résultat des contrôles sans décision explicite.
 
 ## Vérification après déploiement
 
