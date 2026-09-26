@@ -15,8 +15,9 @@ resource "azurerm_network_interface" "main" {
   }
 }
 
-# checkov:skip=CKV_AZURE_50:No VM extension is declared; the rule triggers on the system-assigned identity block
+
 resource "azurerm_linux_virtual_machine" "main" {
+  # checkov:skip=CKV_AZURE_50:No VM extension is declared; the rule triggers on the system-assigned identity block
   for_each            = var.vms
   name                = "vm-${var.prefix}-${each.key}"
   resource_group_name = var.resource_group_name

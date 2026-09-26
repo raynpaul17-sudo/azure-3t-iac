@@ -7,10 +7,11 @@ resource "random_string" "main" {
   upper   = false
 }
 
-# checkov:skip=CKV_AZURE_110:Purge protection disabled so the ephemeral vault name can be reused across destroy/apply cycles
-# checkov:skip=CKV_AZURE_42:Same reason as above; the vault holds no data that must survive a destroy
-# checkov:skip=CKV2_AZURE_32:Private endpoint is billed hourly and requires a private DNS zone; access is restricted by firewall and service endpoints instead
+
 resource "azurerm_key_vault" "main" {
+  # checkov:skip=CKV_AZURE_110:Purge protection disabled so the ephemeral vault name can be reused across destroy/apply cycles
+  # checkov:skip=CKV_AZURE_42:Same reason as above; the vault holds no data that must survive a destroy
+  # checkov:skip=CKV2_AZURE_32:Private endpoint is billed hourly and requires a private DNS zone; access is restricted by firewall and service endpoints instead
   name                        = "kv-${var.prefix}-${random_string.main.result}"
   location                    = var.location
   resource_group_name         = var.resource_group_name
