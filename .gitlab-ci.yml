@@ -61,13 +61,14 @@ terraform:plan:
       aud: "api://AzureADTokenExchange"
   variables:
     ARM_USE_OIDC: "true"
-    ARM_OIDC_TOKEN: "{GITLAB_OIDC_TOKEN}"
     TF_ROOT: "terraform"
   before_script:
+    - export ARM_OIDC_TOKEN="${GITLAB_OIDC_TOKEN}"
+    - echo "token length: ${#GITLAB_OIDC_TOKEN}"
     - cd "${TF_ROOT}"
     - terraform init -backend=false
   script:
-    - terraform plan -var-file="terraform.tfvars.example"
+    - terraform plan -var-file="terraform.tfvars.example" -var "ssh_public_key_path=${CI_PROJECT_DIR}/terraform/fixtures/ci_key.pub"
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
     - if: $CI_COMMIT_BRANCH == "main"

@@ -28,9 +28,6 @@ ssh_frontend_port = 2222
 
 admin_username = "azureuser"
 
-# Throwaway public key, committed so the CI pipeline can run `terraform plan`.
-# Replace with the path to your own key in terraform.tfvars.
-ssh_public_key_path = "fixtures/ci_key.pub"
 
 vms = {
   front = { size = "Standard_B2ats_v2" }
