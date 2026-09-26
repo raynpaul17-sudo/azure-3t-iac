@@ -64,7 +64,6 @@ terraform:plan:
     TF_ROOT: "terraform"
   before_script:
     - export ARM_OIDC_TOKEN="${GITLAB_OIDC_TOKEN}"
-    - echo "token length: ${#GITLAB_OIDC_TOKEN}"
     - cd "${TF_ROOT}"
     - terraform init -backend=false
   script:
