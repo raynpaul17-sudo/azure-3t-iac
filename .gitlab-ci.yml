@@ -57,7 +57,7 @@ terraform:plan:
     name: hashicorp/terraform:1.16
     entrypoint: [""]
   id_tokens:
-    GITLAB_OIDCC_TOKEN:
+    GITLAB_OIDC_TOKEN:
       aud: "api://AzureADTokenExchange"
   variables:
     ARM_USE_OIDC: "true"
