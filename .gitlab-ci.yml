@@ -45,8 +45,7 @@ tflint:
 checkov:
   stage: security
   image:
-    name: bridgecrew/checkov:latest
+    name: bridgecrew/checkov:3.3.19
     entrypoint: [""]
   script:
     - checkov -d terraform --framework terraform
-  allow_failure: true
