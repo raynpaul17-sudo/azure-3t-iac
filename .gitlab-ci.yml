@@ -65,7 +65,17 @@ terraform:plan:
   before_script:
     - export ARM_OIDC_TOKEN="${GITLAB_OIDC_TOKEN}"
     - cd "${TF_ROOT}"
-    - terraform init -backend=false
+    - |
+      STATE_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/default"
+      terraform init \
+        -backend-config="address=${STATE_URL}" \
+        -backend-config="lock_address=${STATE_URL}/lock" \
+        -backend-config="unlock_address=${STATE_URL}/lock" \
+        -backend-config="username=gitlab-ci-token" \
+        -backend-config="password=${CI_JOB_TOKEN}" \
+        -backend-config="lock_method=POST" \
+        -backend-config="unlock_method=DELETE" \
+        -backend-config="retry_wait_min=5"
   script:
     - terraform plan -var-file="terraform.tfvars.example" -var "ssh_public_key_path=${CI_PROJECT_DIR}/terraform/fixtures/ci_key.pub"
   rules:
