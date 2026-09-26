@@ -30,7 +30,7 @@ variable "admin_username" {
   type        = string
 }
 
-variable "ssh_public_key_path" {
+variable "ssh_public_key" {
   description = "Public SSH key content authorized for the admin user"
   type        = string
 }
