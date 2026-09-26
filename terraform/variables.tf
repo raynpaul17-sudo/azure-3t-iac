@@ -76,3 +76,8 @@ variable "secret_name" {
   description = "Name of the created db secret"
   type        = string
 }
+
+variable "secret_expiration_date" {
+  description = "Expiration date of the database password secret (RFC 3339)"
+  type        = string
+}

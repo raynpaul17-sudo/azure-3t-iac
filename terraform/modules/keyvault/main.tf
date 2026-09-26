@@ -7,6 +7,9 @@ resource "random_string" "main" {
   upper   = false
 }
 
+# checkov:skip=CKV_AZURE_110:Purge protection disabled so the ephemeral vault name can be reused across destroy/apply cycles
+# checkov:skip=CKV_AZURE_42:Same reason as above; the vault holds no data that must survive a destroy
+# checkov:skip=CKV2_AZURE_32:Private endpoint is billed hourly and requires a private DNS zone; access is restricted by firewall and service endpoints instead
 resource "azurerm_key_vault" "main" {
   name                        = "kv-${var.prefix}-${random_string.main.result}"
   location                    = var.location
@@ -39,6 +42,7 @@ resource "azurerm_key_vault_secret" "db_password" {
   value_wo         = ephemeral.random_password.db.result
   value_wo_version = 1
   content_type     = "password"
+  expiration_date  = var.secret_expiration_date
 
   depends_on = [azurerm_role_assignment.terraform]
 }

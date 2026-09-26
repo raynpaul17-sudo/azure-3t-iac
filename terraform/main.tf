@@ -50,7 +50,8 @@ module "keyvault" {
     module.network.subnet_ids["back"],
     module.network.subnet_ids["db"],
   ]
-  secret_name = var.secret_name
+  secret_name            = var.secret_name
+  secret_expiration_date = var.secret_expiration_date
 }
 
 # ----NSG Security Rules------
