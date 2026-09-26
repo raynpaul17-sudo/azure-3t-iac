@@ -1,33 +1,30 @@
-# 1. Request OAuth2 token from Azure IMDS using Managed Identity
 - name: Request Azure access token from IMDS
   ansible.builtin.uri:
-    url: "{{ imds_token_url }}?api-version={{ imds_api_version }}&resource={{ keyvault_resource | urlencode }}"
+    url: "{{ keyvault_secret_imds_token_url }}?api-version={{ keyvault_secret_imds_api_version }}&resource={{ keyvault_secret_resource | urlencode }}"
     method: GET
     headers:
       Metadata: "true"
     status_code: 200
-  register: imds_response
+  register: keyvault_secret_imds_response
   changed_when: false
   no_log: true
 
-# 2. Retrieve the secret directly from Azure Key Vault API
 - name: Fetch secret value from Key Vault
   ansible.builtin.uri:
-    url: "{{ keyvault_uri }}/secrets/{{ keyvault_secret_name }}?api-version={{ keyvault_api_version }}"
+    url: "{{ keyvault_uri }}/secrets/{{ keyvault_secret_name }}?api-version={{ keyvault_secret_api_version }}"
     method: GET
     headers:
-      Authorization: "Bearer {{ imds_response.json.access_token }}"
+      Authorization: "Bearer {{ keyvault_secret_imds_response.json.access_token }}"
     status_code: 200
-  register: kv_secret_response
+  register: keyvault_secret_response
   retries: 5
   delay: 10
-  until: kv_secret_response is succeeded
+  until: keyvault_secret_response is succeeded
   changed_when: false
   no_log: true
 
-# 3. Set db_password fact in memory for downstream roles
-- name: Set db_password fact
+- name: Set db_password fact # noqa: var-naming[no-role-prefix]
   ansible.builtin.set_fact:
-    db_password: "{{ kv_secret_response.json.value }}"
+    db_password: "{{ keyvault_secret_response.json.value }}"
     cacheable: false
   no_log: true

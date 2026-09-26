@@ -1,4 +1,4 @@
-ufw_custom_rules:
+common_ufw_custom_rules:
   - port: "80"
     proto: tcp
     src: any

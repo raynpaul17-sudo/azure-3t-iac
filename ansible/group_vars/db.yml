@@ -1,4 +1,4 @@
-ufw_custom_rules:
+common_ufw_custom_rules:
   - port: "5432"
     proto: tcp
     src: "{{ subnet_back }}"

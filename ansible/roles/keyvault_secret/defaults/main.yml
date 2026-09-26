@@ -1,7 +1,4 @@
-# Azure Instance Metadata Service endpoint (link-local, reachable from the VM only)
-imds_token_url: "http://169.254.169.254/metadata/identity/oauth2/token"
-imds_api_version: "2018-02-01"
-
-# Resource the token is requested for, and Key Vault data plane API version
-keyvault_resource: "https://vault.azure.net"
-keyvault_api_version: "7.4"
+keyvault_secret_imds_token_url: "http://169.254.169.254/metadata/identity/oauth2/token"
+keyvault_secret_imds_api_version: "2018-02-01"
+keyvault_secret_resource: "https://vault.azure.net"
+keyvault_secret_api_version: "7.4"

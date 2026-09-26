@@ -17,6 +17,7 @@
   community.postgresql.postgresql_alter_system:
     param: listen_addresses
     value: "localhost, {{ ansible_facts['default_ipv4']['address'] }}"
+  become: true
   become_user: postgres
   notify: Restart postgresql
 
@@ -29,6 +30,7 @@
     source: "{{ subnet_back }}" # Backend subnet
     method: scram-sha-256
     create: true
+  become: true
   become_user: postgres
   notify: Reload postgresql
 
@@ -41,6 +43,7 @@
     password: "{{ db_password }}"
     encrypted: true
     state: present
+  become: true
   become_user: postgres
   no_log: true
 
@@ -49,4 +52,5 @@
     name: "{{ db_name }}"
     owner: "{{ db_user }}"
     state: present
+  become: true
   become_user: postgres

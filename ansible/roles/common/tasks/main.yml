@@ -35,8 +35,8 @@
     rule: allow
     port: "{{ item.port }}"
     proto: "{{ item.proto | default('tcp') }}"
-    src: "{{ item.src | default('any')}}"
-  loop: "{{ ufw_custom_rules }}"
+    src: "{{ item.src | default('any') }}"
+  loop: "{{ common_ufw_custom_rules }}"
 
 - name: Set default incoming policy to deny and enable UFW
   community.general.ufw:
