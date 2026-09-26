@@ -1,0 +1,42 @@
+# Copy this file to terraform.tfvars and adjust the values.
+# terraform.tfvars is never committed.
+#
+# This file is also used by the CI pipeline to run `terraform plan`,
+# so every variable must have a valid value here.
+
+location = "swedencentral"
+prefix   = "3t-iac-rp"
+
+vnet_address_space = ["10.10.0.0/16"]
+
+subnets = {
+  front = { address_prefix = "10.10.1.0/24" }
+  back  = { address_prefix = "10.10.2.0/24", service_endpoints = ["Microsoft.KeyVault"] }
+  db    = { address_prefix = "10.10.3.0/24", service_endpoints = ["Microsoft.KeyVault"] }
+}
+
+# Public IP allowed to reach SSH and the key vault.
+# 192.0.2.0/24 is reserved for documentation and is never routed.
+admin_ip = "192.0.2.1/32"
+
+lb_rules = {
+  http  = { frontend_port = 80, backend_port = 80, protocol = "Tcp" }
+  https = { frontend_port = 443, backend_port = 443, protocol = "Tcp" }
+}
+
+ssh_frontend_port = 2222
+
+admin_username = "azureuser"
+
+# Throwaway public key, committed so the CI pipeline can run `terraform plan`.
+# Replace with the path to your own key in terraform.tfvars.
+ssh_public_key_path = "fixtures/ci_key.pub"
+
+vms = {
+  front = { size = "Standard_B2ats_v2" }
+  back  = { size = "Standard_B2ats_v2" }
+  db    = { size = "Standard_B2ats_v2" }
+}
+
+secret_name            = "db-password"
+secret_expiration_date = "2027-01-01T00:00:00Z"
