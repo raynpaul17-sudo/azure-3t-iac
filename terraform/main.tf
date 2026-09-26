@@ -30,7 +30,7 @@ module "compute" {
   subnet_ids               = module.network.subnet_ids
   vms                      = var.vms
   admin_username           = var.admin_username
-  ssh_public_key_path      = file(pathexpand(var.ssh_public_key_path))
+  ssh_public_key           = file(pathexpand(var.ssh_public_key_path))
   backend_pool_outbound_id = module.loadbalancer.backend_pool_outbound_id
   nat_rule_ssh_id          = module.loadbalancer.nat_rule_ssh_id
   backend_pool_web_id      = module.loadbalancer.backend_pool_web_id
