@@ -31,7 +31,6 @@ ansible-lint:
     - cd ansible
     - ansible-galaxy collection install -r requirements.yaml
   script:
-    - cd ansible
     - ansible-lint
 
 tflint:
