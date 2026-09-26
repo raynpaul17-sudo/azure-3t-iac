@@ -5,6 +5,7 @@ stages:
   - validate # fmt, validate, lint
   - test # secret detection
   - security # checkov
+  - plan
 
 terraform-fmt:
   stage: validate
@@ -49,3 +50,24 @@ checkov:
     entrypoint: [""]
   script:
     - checkov -d terraform --framework terraform
+
+terraform:plan:
+  stage: plan
+  image:
+    name: hashicorp/terraform:1.16
+    entrypoint: [""]
+  id_tokens:
+    GITLAB_OIDCC_TOKEN:
+      aud: "api://AzureADTokenExchange"
+  variables:
+    ARM_USE_OIDC: "true"
+    ARM_OIDC_TOKEN: "{GITLAB_OIDC_TOKEN}"
+    TF_ROOT: "terraform"
+  before_script:
+    - cd "${TF_ROOT}"
+    - terraform init -backend=false
+  script:
+    - terraform plan -var-file="terraform.tfvars.example"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+    - if: $CI_COMMIT_BRANCH == "main"
