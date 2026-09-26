@@ -65,3 +65,17 @@ Le coffre refuse tout accès par défaut. Seuls l'adresse d'administration et le
 - **Accès public du coffre maintenu** : le coffre conserve une adresse publique, protégée par son pare-feu. Un point de terminaison privé le retirerait totalement d'internet, au prix d'une facturation horaire et d'une zone DNS privée.
 - **Protection contre la purge désactivée** : l'infrastructure étant éphémère, le coffre doit pouvoir être purgé à la destruction pour que son nom soit réutilisable. En production, cette protection serait activée.
 - **Propagation des attributions de rôle** : une attribution met quelques minutes à devenir effective, ce qui impose une dépendance explicite entre l'attribution et la première écriture du secret.
+
+## Vérification après déploiement
+
+Un script rejouable exécute la matrice de flux sur l'infrastructure déployée et compare chaque résultat à celui attendu. Un flux qui doit être bloqué est un test à part entière : il échoue s'il devient joignable.
+
+_./tests/check-isolation.sh_
+
+Le script couvre trois familles de contrôles :
+
+- **isolation interne** : les flux autorisés entre tiers fonctionnent, et ceux qui ne le sont pas échouent, notamment l'accès direct du front à la base
+- **exposition externe** : seuls les ports web et le port d'administration répondent sur l'adresse publique ; les ports applicatif et base de données ne sont pas joignables
+- **points d'entrée HTTP** : la redirection vers HTTPS, la route de santé du reverse proxy, et la traversée complète jusqu'à la base
+
+Les valeurs testées proviennent des outputs Terraform : aucune adresse n'est codée en dur. Le script sort en erreur dès qu'un contrôle échoue, ce qui le rend exploitable dans une chaîne d'intégration.
