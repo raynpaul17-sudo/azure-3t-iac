@@ -43,7 +43,7 @@ graph TD
 
 Le load balancer est l'unique point d'entrée public. Aucune machine virtuelle ne possède d'adresse publique : l'accès administratif passe par une règle de traduction vers le front, puis par rebond SSH vers les autres tiers. Chaque subnet est protégé par son propre groupe de sécurité réseau, en refus par défaut, doublé d'un pare-feu local sur chaque machine.
 
-Le mot de passe de la base est généré par Terraform sans jamais être écrit dans son état, déposé dans Key Vault, et lu par les machines via leur identité managée : aucun identifiant n'est stocké nulle part.
+Le mot de passe de la base est généré par une ressource éphémère Terraform et transmis à Key Vault par un argument write-only : il ne transite ni par l'état Terraform ni par les journaux. Les machines le lisent via leur identité managée, avec un accès restreint à ce seul secret. Aucun identifiant n'est stocké nulle part.
 
 ## Comment le lancer
 
